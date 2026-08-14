@@ -17,6 +17,16 @@ This extension listens for the `agent_end` event that Pi `0.79.10` actually emit
 
 ## Install
 
+### One-liner from GitHub
+
+```bash
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/getkimchi/herdr-kimchi/main/herdr-agent-state.ts \
+  -o ~/.config/kimchi/harness/extensions/herdr-agent-state.ts
+```
+
+### Manual copy
+
 Copy `herdr-agent-state.ts` into Kimchi's extensions directory:
 
 ```bash
