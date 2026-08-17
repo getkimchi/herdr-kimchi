@@ -57,7 +57,7 @@ It reports `source: "herdr:pi"` and `agent: "pi"` so it is compatible with Herdr
 
 ## Compatibility
 
-- Kimchi `0.79.10` and later
+- Kimchi `0.79.10` and later (verified against `@earendil-works/pi-coding-agent` `0.84.1`)
 - Herdr with Pi integration support
 
 ## License

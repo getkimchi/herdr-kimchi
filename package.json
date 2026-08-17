@@ -1,0 +1,15 @@
+{
+	"name": "@getkimchi/herdr-kimchi",
+	"version": "0.1.0",
+	"description": "Herdr lifecycle bridge for Kimchi",
+	"type": "module",
+	"license": "Apache-2.0",
+	"devDependencies": {
+		"@earendil-works/pi-coding-agent": "0.84.1",
+		"@types/node": "^22.19.18",
+		"typescript": "^5.9.3"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit"
+	}
+}

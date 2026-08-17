@@ -3,8 +3,8 @@
 // add custom hooks/plugins beside this file instead of editing it.
 // HERDR_INTEGRATION_ID=pi
 // HERDR_INTEGRATION_VERSION=6
-// @ts-nocheck
 
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
 import net from "node:net"
 
 const HERDR_ENV = process.env.HERDR_ENV
@@ -190,7 +190,7 @@ async function drainStateQueue(): Promise<void> {
 	}
 }
 
-export default function (pi: any) {
+export default function (pi: ExtensionAPI): void {
 	if (!enabled()) {
 		return
 	}
@@ -240,13 +240,13 @@ export default function (pi: any) {
 		publishState()
 	})
 
-	pi.on("session_start", async (event: any, ctx: any) => {
+	pi.on("session_start", async (_event: any, ctx: any) => {
 		if (ctx?.hasUI !== true) {
 			return
 		}
 		rootSession = true
 		updateSessionRef(ctx)
-		await reportSession(event?.reason)
+		await reportSession(_event?.reason)
 		agentActive = ctx?.isIdle?.() === false
 		publishState(true)
 	})
@@ -261,7 +261,7 @@ export default function (pi: any) {
 		publishState()
 	})
 
-	// Pi 0.79.10 (used by Kimchi) emits `agent_end`. Herdr's bundled Pi
+	// Pi 0.79.10+ (including 0.84.1) emits `agent_end`. Herdr's bundled Pi
 	// extension only listens for `agent_settled`, so the pane stays stuck in
 	// `working` after a turn completes. Listen for `agent_end` so Herdr
 	// transitions back to `idle` when the agent run is done.
