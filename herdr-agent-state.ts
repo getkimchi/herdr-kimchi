@@ -12,7 +12,8 @@ const socketPath = process.env.HERDR_SOCKET_PATH;
 const socketEndpoint =
   process.platform === "win32" && socketPath ? `\\\\.\\pipe\\${socketPath}` : socketPath;
 const paneId = process.env.HERDR_PANE_ID;
-const source = "herdr:pi";
+const source = process.env.KIMCHI_AGENT_SOURCE || "kimchi-bridge";
+const agentName = process.env.KIMCHI_AGENT_NAME || "kimchi";
 
 function enabled() {
   return HERDR_ENV === "1" && !!socketPath && !!paneId;
@@ -119,7 +120,7 @@ function reportSession(sessionStartSource?: string): Promise<void> {
     params: {
       pane_id: paneId,
       source,
-      agent: "pi",
+      agent: agentName,
       seq: nextReportSeq(),
       session_start_source: sessionStartSource,
       ...sessionRef,
@@ -134,7 +135,7 @@ function sendState(state: AgentState, message?: string, seq = nextReportSeq()): 
     params: withSessionRef({
       pane_id: paneId,
       source,
-      agent: "pi",
+      agent: agentName,
       state,
       message,
       seq,

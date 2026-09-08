@@ -57,7 +57,9 @@ The extension reads these, connects to the socket, and sends JSON-RPC-style mess
 - `pane.report_agent_session` — when a session starts, carrying the session file path
 - `pane.report_agent` — whenever state changes (`idle`/`working`/`blocked`)
 
-It reports `source: "herdr:pi"` and `agent: "pi"` so it is compatible with Herdr's existing Pi integration today. A future version will switch to `herdr:kimchi` / `kimchi` once Herdr lands a dedicated Kimchi integration.
+It reports `source: "kimchi-bridge"` and `agent: "kimchi"`. A custom source is required: Herdr only honors `herdr:`-namespaced integration reports (like `herdr:pi`) for panes it natively detects as that agent. A `kimchi` process is not a natively detected Pi agent, so a `herdr:pi` report is silently dropped. Reporting a plain source (e.g. `kimchi-bridge`) registers the pane as an agent in any pane herdr manages.
+
+Both values can be overridden per pane with environment variables, so you can run multiple distinct Kimchi agents: set `KIMCHI_AGENT_NAME` (default `kimchi`) and optionally `KIMCHI_AGENT_SOURCE` (default `kimchi-bridge`) on the pane that launches Kimchi.
 
 ## Compatibility
 
