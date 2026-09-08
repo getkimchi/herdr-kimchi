@@ -11,9 +11,14 @@ This is a Pi extension that Kimchi loads automatically when it starts inside a [
 
 ## Why this exists
 
-Kimchi is built on `@earendil-works/pi-coding-agent` `0.79.10`. Herdr's bundled Pi extension expects a newer Pi runtime that emits `agent_settled`, which does not exist in `0.79.10`. Without this bridge, a Kimchi pane inside Herdr stays stuck on `working` forever after the first turn.
+Herdr ships a bundled Pi integration (`HERDR_INTEGRATION_ID=pi`). Current Kimchi is built on `@earendil-works/pi-coding-agent` **0.84.1**, whose runtime emits `agent_settled` (the higher-level "truly done" event) in interactive mode. This repository ships a kimchi-versioned copy of that integration so that:
 
-This extension listens for the `agent_end` event that Pi `0.79.10` actually emits, so state transitions work correctly.
+- it is a known-good, pinned version for Kimchi users, and
+- it is not silently overwritten by Herdr's generic `herdr integration install pi` step.
+
+This copy tracks Herdr's **v8** Pi integration: it drives the `idle` transition from `agent_settled` (guarded by `ctx.isIdle()`), and gates activation on Kimchi's TUI mode.
+
+> **Older Kimchi:** if your Kimchi runs a Pi runtime that does **not** emit `agent_settled` (for example `0.79.10`), use the previous revision of this file, which tracked Herdr's integration via the `agent_end` event instead. Prefer upgrading Kimchi; `agent_settled` reflects a truly settled turn (no auto-retry or compaction continuation), which `agent_end` alone does not.
 
 ## Install
 
@@ -51,14 +56,13 @@ The extension reads these, connects to the socket, and sends JSON-RPC-style mess
 
 - `pane.report_agent_session` — when a session starts, carrying the session file path
 - `pane.report_agent` — whenever state changes (`idle`/`working`/`blocked`)
-- `pane.release_agent` — when the session shuts down due to `quit`
 
 It reports `source: "herdr:pi"` and `agent: "pi"` so it is compatible with Herdr's existing Pi integration today. A future version will switch to `herdr:kimchi` / `kimchi` once Herdr lands a dedicated Kimchi integration.
 
 ## Compatibility
 
-- Kimchi `0.79.10` and later (verified against `@earendil-works/pi-coding-agent` `0.84.1`)
-- Herdr with Pi integration support
+- Kimchi built on `@earendil-works/pi-coding-agent` that emits `agent_settled` (present from `0.81.0` in the RPC API; Kimchi currently pins `0.84.1`, verified)
+- Herdr with Pi integration support (v8)
 
 ## License
 
