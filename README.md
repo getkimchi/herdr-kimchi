@@ -61,6 +61,29 @@ It reports `source: "kimchi-bridge"` and `agent: "kimchi"`. A custom source is r
 
 Both values can be overridden per pane with environment variables, so you can run multiple distinct Kimchi agents: set `KIMCHI_AGENT_NAME` (default `kimchi`) and optionally `KIMCHI_AGENT_SOURCE` (default `kimchi-bridge`) on the pane that launches Kimchi.
 
+### Session storage in herdr (`HERDR_AGENT=pi`)
+
+herdr only persists native session references from official `herdr:` integration sources, and only
+for panes it natively detects as that agent. The plain `kimchi-bridge` source registers agent state
+(label, `working`/`idle`) but the session is never stored, and `herdr:pi` reports from a pane herdr
+does not detect as pi are dropped.
+
+Launching Kimchi with `HERDR_AGENT=pi` — herdr's escape hatch for wrapper-hidden agents — fixes
+both sides: herdr natively treats the pane's process as pi, and the bridge then automatically
+reports through the official pi channel (`source: "herdr:pi"`, `agent: "pi"`). The session lands
+as a native `herdr:pi` reference pointing at the Kimchi session file (pi-format JSONL), so
+pi-aware tools such as token dashboards pick Kimchi panes up.
+
+```sh
+HERDR_AGENT=pi kimchi
+```
+
+- The pane's agent label shows as `pi` rather than `kimchi` (required: a report whose agent name
+  does not match the official source is ignored). `herdr agent rename <pane> kimchi` restores the
+  display name per pane.
+- Explicit `KIMCHI_AGENT_SOURCE` / `KIMCHI_AGENT_NAME` overrides keep their precedence over the
+  automatic pi reporting.
+
 ## Compatibility
 
 - Kimchi built on `@earendil-works/pi-coding-agent` that emits `agent_settled` (present from `0.81.0` in the RPC API; Kimchi currently pins `0.84.1`, verified)

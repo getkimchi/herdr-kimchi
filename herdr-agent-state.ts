@@ -12,8 +12,21 @@ const socketPath = process.env.HERDR_SOCKET_PATH;
 const socketEndpoint =
   process.platform === "win32" && socketPath ? `\\\\.\\pipe\\${socketPath}` : socketPath;
 const paneId = process.env.HERDR_PANE_ID;
-const source = process.env.KIMCHI_AGENT_SOURCE || "kimchi-bridge";
-const agentName = process.env.KIMCHI_AGENT_NAME || "kimchi";
+// When herdr is told to treat this pane's process as the pi agent
+// (HERDR_AGENT=pi — herdr's escape hatch for wrapper-hidden agents), report
+// through the official pi integration channel instead of a plain source.
+// herdr only stores native session references from official herdr: sources
+// on panes it natively detects as that agent: plain-source reports
+// (kimchi-bridge) register agent state but the session is never stored, and
+// herdr:pi reports from a pane herdr does not detect as pi are dropped.
+// With HERDR_AGENT=pi herdr detects the pane as pi, so reporting as
+// herdr:pi / pi makes the session land as a native reference — kimchi
+// transcripts are pi-format JSONL, so pi-aware tools (token dashboards,
+// session restore) pick them up. Explicit KIMCHI_AGENT_SOURCE /
+// KIMCHI_AGENT_NAME overrides keep their precedence.
+const asPi = process.env.HERDR_AGENT === "pi";
+const source = process.env.KIMCHI_AGENT_SOURCE || (asPi ? "herdr:pi" : "kimchi-bridge");
+const agentName = process.env.KIMCHI_AGENT_NAME || (asPi ? "pi" : "kimchi");
 
 function enabled() {
   return HERDR_ENV === "1" && !!socketPath && !!paneId;
